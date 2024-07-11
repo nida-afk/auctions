@@ -1,0 +1,70 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div class="container" ><center>
+    <div class="col-md-8">
+        <div class="card mb-8">
+            <h2 class="my-3">{{ listing.title }}</h2>
+            <div class="card mb-4">
+                <img class="card-img-top" src="{{ listing.image_url }}" alt="{{ listing.title }}">
+            </div>
+                <p>{{ listing.description }}</p>
+            <p>Posted by: {{ listing.user }}</p>
+            <p>Current Price: {{ cp }}</p>
+
+
+            {% if user.is_authenticated %}
+                <div class="d-flex flex-column">
+                    {% if in_watchlist %}
+                        <form method="POST" class="mb-2">
+                            {% csrf_token %}
+                            <button type="submit" name="watchlist_action" class="btn btn-primary">Remove from Watchlist</button>
+                        </form>
+                    {% else %}
+                        <form method="POST" class="mb-2">
+                            {% csrf_token %}
+                            <button type="submit" name="watchlist_action" class="btn btn-primary">Add to Watchlist</button>
+                        </form>
+                    {% endif %}
+                    {% if listing.winner %}
+                        {% if won_auction %}
+                            <div class="alert alert-success w-100">Congratulations! You won this auction.</div>
+                        {% else %}
+                            <div class="alert alert-danger w-100"> Auction closed </div>
+                        {% endif %}
+                    {% else %}
+                        {% if user != listing.user %}
+                            <form method="POST" class="mb-2">
+                                {% csrf_token %}
+                                <input type="number" name="ba" min="{{ cp }}" step="0.01" required class="form-control">
+                                <button type="submit" class="btn btn-primary">Place Bid</button>
+                            </form>
+                        {% else %}
+                            <form method="POST" class="mb-2">
+                                {% csrf_token %}
+                                <button type="submit" name="close" class="btn btn-danger ">Close Auction</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+
+                    <form method="POST" class="mt-3">
+                        {% csrf_token %}
+                        <h6>Share your views! </h6>
+                        <textarea name="comment_text" required class="form-control" > </textarea>
+                        <p></p>
+                        <button type="submit" name="add" class="btn btn-primary">Add Comment</button>
+                    </form>
+                </div>
+            {% endif %}
+
+            <h3 class="my-3">Comments : </h3>
+            {% for comment in comments %}
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <p class="card-text"><B>{{ comment.user.username }}:</B> {{ comment.text }}</p>
+                    </div>
+                </div>
+
+            {% endfor %}</div></div>
+        </div><center>
+{% endblock %}
